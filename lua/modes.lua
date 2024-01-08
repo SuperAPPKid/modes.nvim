@@ -62,6 +62,7 @@ local winhighlight = {
 local colors = {}
 local blended_colors = {}
 local operator_started = false
+local tracking_key = ''
 local in_ignored_buffer = function()
 	return vim.api.nvim_get_option_value('buftype', { buf = 0 }) ~= '' -- not a normal buffer
 		or not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) -- unlisted buffer
@@ -284,6 +285,7 @@ M.setup = function(opts)
 	M.define()
 
 	vim.on_key(function(key)
+		tracking_key = key
 		local ok, current_mode = pcall(vim.fn.mode)
 		if not ok then
 			M.reset()
@@ -296,20 +298,24 @@ M.setup = function(opts)
 				M.reset()
 				return
 			end
-
-			if key == 'y' then
-				M.highlight('copy')
-				operator_started = true
-				return
-			end
-
-			if key == 'd' then
-				M.highlight('delete')
-				operator_started = true
-				return
-			end
 		end
 	end)
+
+	--Tracking copy and delete mode
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:*o',
+		callback = function(_)
+			if tracking_key == 'y' then
+				operator_started = true
+				M.highlight('copy')
+			end
+
+			if tracking_key == 'd' then
+				operator_started = true
+				M.highlight('delete')
+			end
+		end,
+	})
 
 	---Set highlights when colorscheme changes
 	vim.api.nvim_create_autocmd('ColorScheme', {

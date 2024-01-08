@@ -62,10 +62,11 @@ local winhighlight = {
 local colors = {}
 local blended_colors = {}
 local operator_started = false
+local tracking_key = ''
 local in_ignored_buffer = function()
 	return vim.api.nvim_buf_get_option(0, 'buftype') ~= '' -- not a normal buffer
-		or not vim.api.nvim_buf_get_option(0, 'buflisted') -- unlisted buffer
-		or vim.tbl_contains(config.ignore_filetypes, vim.bo.filetype)
+		 or not vim.api.nvim_buf_get_option(0, 'buflisted') -- unlisted buffer
+		 or vim.tbl_contains(config.ignore_filetypes, vim.bo.filetype)
 end
 
 M.reset = function()
@@ -251,6 +252,7 @@ M.setup = function(opts)
 	M.define()
 
 	vim.on_key(function(key)
+		tracking_key = key
 		local ok, current_mode = pcall(vim.fn.mode)
 		if not ok then
 			M.reset()
@@ -261,18 +263,6 @@ M.setup = function(opts)
 			-- reset if coming back from operator pending mode
 			if operator_started then
 				M.reset()
-				return
-			end
-
-			if key == 'y' then
-				M.highlight('copy')
-				operator_started = true
-				return
-			end
-
-			if key == 'd' then
-				M.highlight('delete')
-				operator_started = true
 				return
 			end
 		end
@@ -304,6 +294,22 @@ M.setup = function(opts)
 	vim.api.nvim_create_autocmd('ModeChanged', {
 		pattern = '[vV\x16]:n',
 		callback = M.reset,
+	})
+
+	--Tracking copy and delete mode
+	vim.api.nvim_create_autocmd('ModeChanged', {
+		pattern = '*:*o',
+		callback = function(_)
+			if tracking_key == 'y' then
+				operator_started = true
+				M.highlight('copy')
+			end
+
+			if tracking_key == 'd' then
+				operator_started = true
+				M.highlight('delete')
+			end
+		end,
 	})
 
 	---Reset highlights

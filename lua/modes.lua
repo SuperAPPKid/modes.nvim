@@ -81,7 +81,8 @@ M.highlight = function(scene)
 	end
 
 	local winhl_map = {}
-	local prev_value = vim.api.nvim_get_option_value('winhighlight', { win = 0 })
+	local prev_value =
+		vim.api.nvim_get_option_value('winhighlight', { win = 0 })
 
 	-- mapping the old value of 'winhighlight'
 	if prev_value ~= '' then
@@ -108,7 +109,11 @@ M.highlight = function(scene)
 	for builtin, hl in pairs(winhl_map) do
 		table.insert(new_value, ('%s:%s'):format(builtin, hl))
 	end
-	vim.api.nvim_set_option_value('winhighlight', table.concat(new_value, ','), { win = 0 })
+	vim.api.nvim_set_option_value(
+		'winhighlight',
+		table.concat(new_value, ','),
+		{ win = 0 }
+	)
 
 	if vim.api.nvim_get_option_value('showmode', { scope = 'global' }) then
 		if scene == 'visual' then
@@ -191,11 +196,21 @@ M.define = function()
 	for _, mode in ipairs({ 'Copy', 'Delete', 'Insert', 'Visual' }) do
 		local mode_fg = colors[mode:lower()]
 		if mode_fg ~= '' then
-			local mode_bg = (mode:lower() == 'visual') and 'NONE' or blended_colors[mode:lower()]
+			local mode_bg = (mode:lower() == 'visual') and 'NONE'
+				or blended_colors[mode:lower()]
 			utils.set_hl(('Modes%sCursorLine'):format(mode), { bg = mode_bg })
-			utils.set_hl(('Modes%sCursorLineNr'):format(mode), { fg = mode_fg, bg = mode_bg })
-			utils.set_hl(('Modes%sCursorLineSign'):format(mode), { bg = mode_bg })
-			utils.set_hl(('Modes%sCursorLineFold'):format(mode), { bg = mode_bg })
+			utils.set_hl(
+				('Modes%sCursorLineNr'):format(mode),
+				{ fg = mode_fg, bg = mode_bg }
+			)
+			utils.set_hl(
+				('Modes%sCursorLineSign'):format(mode),
+				{ bg = mode_bg }
+			)
+			utils.set_hl(
+				('Modes%sCursorLineFold'):format(mode),
+				{ bg = mode_bg }
+			)
 		end
 	end
 
@@ -216,7 +231,8 @@ M.enable_managed_ui = function()
 		return
 	end
 
-	local cursor_hl = 'v-sm:ModesVisual,i-ci-ve:ModesInsert,r-cr-o:ModesOperator'
+	local cursor_hl =
+		'v-sm:ModesVisual,i-ci-ve:ModesInsert,r-cr-o:ModesOperator'
 	if config.set_cursor then
 		if vim.o.guicursor == '' then
 			vim.o.guicursor = cursor_hl
@@ -235,7 +251,8 @@ M.disable_managed_ui = function()
 		return
 	end
 
-	local cursor_hl = ',v%-sm:ModesVisual,i%-ci%-ve:ModesInsert,r%-cr%-o:ModesOperator'
+	local cursor_hl =
+		',v%-sm:ModesVisual,i%-ci%-ve:ModesInsert,r%-cr%-o:ModesOperator'
 	if config.set_cursor then
 		vim.o.guicursor = vim.o.guicursor:gsub(cursor_hl, '')
 	end
@@ -330,7 +347,7 @@ M.setup = function(opts)
 			if current_mode ~= 'v' then
 				M.reset()
 			end
-		end
+		end,
 	})
 
 	---Reset other highlights

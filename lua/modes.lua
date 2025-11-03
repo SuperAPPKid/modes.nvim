@@ -391,7 +391,7 @@ H.disable_managed_ui = function()
 		-- ensure cursor reset (see https://github.com/neovim/neovim/issues/21018)
 		local cursor = vim.o.guicursor
 		vim.o.guicursor = 'a:'
-		vim.cmd.redrawstatus()
+		vim.cmd.sleep('1m')
 		vim.o.guicursor = cursor
 	end
 end
@@ -480,7 +480,7 @@ Modes.setup = function(opts)
 			end
 
 			H.highlight('replace')
-			vim.cmd.redrawstatus() -- ensure showcmd area is updated
+			vim.cmd.sleep('1m') -- ensure showcmd area is updated
 			vim.schedule(H.restore) -- restore after motion
 		end
 	end)
